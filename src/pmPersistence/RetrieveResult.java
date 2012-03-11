@@ -1,11 +1,8 @@
 package pmPersistence;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.util.Set;
 
 public class RetrieveResult {
@@ -13,23 +10,16 @@ public class RetrieveResult {
 	@SuppressWarnings("rawtypes")
 	private Class myClass;
 	private ResultSet myResultSet;
-	private DBTable myTable;
+	private Database myDb;
 	@SuppressWarnings("rawtypes")
 	private Class[] myCtorArgs;
-	RetrieveResult(String persistentClass, ResultSet rs, DBTable table)
+	RetrieveResult(@SuppressWarnings("rawtypes") Class persistentClass, ResultSet rs, Database db)
 	{
-		myTable = table;
-		try {
-			myClass = Class.forName(persistentClass);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		myDb = db;
+		myClass = persistentClass;
 		myCtorArgs = new Class[1];
-		myCtorArgs[0] = DBTable.class;
+		myCtorArgs[0] = Database.class;
 		myResultSet = rs;
-		
-		 
 	}
 		
 	@SuppressWarnings("unchecked")
@@ -41,9 +31,10 @@ public class RetrieveResult {
 			if(myResultSet.next())
 			{
 				try {
-					ret = (PersistentObject)myClass.getConstructor(myCtorArgs).newInstance(myTable);
+					ret = (PersistentObject)myClass.getConstructor(myCtorArgs).newInstance(myDb);
 					//initialize the object...
 					retrieveRow(ret);
+					ret.isNew = false;
 				}
 				catch(InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException s)
 				{
@@ -60,116 +51,22 @@ public class RetrieveResult {
 	
 	private void retrieveRow(PersistentObject obj)
 	{
-		Set<String> fields = myTable.Fields;
+		Set<String> fields = obj.myTable.Fields;
 		for(String fname : fields)
 		{
-			Object prop = obj.getProperties().get(fname);
-			
-			obj.getProperties().put(fname, getPropertyValue(prop, fname));
+			obj.getProperties().put(fname, getPropertyValue(fname));
 		}
 	}
 	
-	private Object getPropertyValue(Object obj, String field)
+	private Object getPropertyValue(String field)
 	{
 		Object ret = null;
 		try
 		{
-			if(obj != null)
+			ret = myResultSet.getObject(field);
+			if((ret != null) && (ret instanceof String))
 			{
-				/*
-				if(obj instanceof PersistentObject)
-				{
-					myResultSet.
-					//retrieve a copy of the persistent object...
-					PersistentObject po = (PersistentObject)obj;
-					String whereStmt = po.getTable().KeyField + " = " + myResultSet.getString(column);
-					myTable.Db.retrievePersistentObjects(obj.getClass().getName(), myTable.Name, whereStmt);
-					
-					//get the foreign key...
-					ret = getValueString(po.getProperties().get(po.getTable().KeyField));
-				}
-				else */
-				if(obj instanceof String)
-				{
-					return myTable.Db.unsanitize(myResultSet.getString(field));
-				}
-				else if(obj instanceof Integer)
-				{
-					ret = myResultSet.getInt(field);
-					if(ret == null)
-					{
-						ret = new Integer(0);
-					}
-				}
-				else if(obj instanceof Long)
-				{
-					ret = myResultSet.getLong(field);
-					if(ret == null)
-					{
-						ret = new Long(0);
-					}
-				}
-				else if(obj instanceof Float)
-				{
-					ret = myResultSet.getFloat(field);
-					if(ret == null)
-					{
-						ret = new Float(0.0);
-					}
-				}
-				else if(obj instanceof Double)
-				{
-					ret =  myResultSet.getDouble(field);
-					if(ret == null)
-					{
-						ret = new Double(0.0);
-					}
-				}
-				else if(obj instanceof Boolean)
-				{
-					ret = myResultSet.getBoolean(field);
-					if(ret == null)
-					{
-						ret = new Boolean(false);
-					}
-				}
-				else if(obj instanceof Byte)
-				{
-					ret = myResultSet.getByte(field);
-					if(ret == null)
-					{
-						ret = new Byte((byte)0);
-					}
-				}
-				else if(obj instanceof Date)
-				{
-					ret = myResultSet.getDate(field);
-					if(ret == null)
-					{
-						ret = new Date(0);
-					}
-				}
-				else if(obj instanceof Time)
-				{
-					ret = myResultSet.getTime(field);
-					if(ret == null)
-					{
-						ret = new Time(0);
-					}
-				}
-				else if(obj instanceof Timestamp)
-				{
-					ret = myResultSet.getTimestamp(field);
-					if(ret == null)
-					{
-						ret = new Timestamp(0);
-					}
-				}
-				else
-				{
-					//don't know how to handle this type...
-					//obj. = myTable.Db.unsanitize(obj.toString());
-				}
+				ret = Database.unsanitize((String)ret);
 			}
 		}
 		catch(SQLException s)

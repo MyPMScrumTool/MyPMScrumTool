@@ -5,9 +5,11 @@ import java.util.Map;
 
 public class PersistentObject {
 	private Map<String, Object> myProperties;
-	private DBTable myTable;
+	protected final DBTable myTable;
+	protected boolean isNew;
 	protected PersistentObject(DBTable table)
 	{
+		isNew = true;
 		myTable = table;
 		myProperties = new HashMap<String, Object>();
 		for(String s : myTable.Fields)

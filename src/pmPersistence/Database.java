@@ -35,8 +35,6 @@ public class Database {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//System.out.println("Connected to the database");
-		
 	}
 	
 	public void closeDatabase()
@@ -47,7 +45,6 @@ public class Database {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//System.out.println("Disconnected from database");
 	}
 	
 	public DBTable getTable(String name)
@@ -56,10 +53,6 @@ public class Database {
 		String keyField="";
 		try
 		{
-			//Statement st = myConnection.createStatement();
-			//ResultSet rs = st.executeQuery("DESCRIBE "+name);
-			//ResultSetMetaData md = rs.getMetaData();
-			//int col = md.getColumnCount();
 			DatabaseMetaData dbm = myConnection.getMetaData();
 			ResultSet rs = dbm.getColumns(null, "%", name, "%");
 			String colName;
@@ -67,13 +60,7 @@ public class Database {
 				colName = rs.getString("COLUMN_NAME");
 				fields.add(colName);
 			}
-			/*
-			for (int i = 1; i <= col; i++){
-			  colName = md.getColumnName(i);
-			  fields.add(colName);
-			}
-			*/
-			
+		
 			ResultSet rs2 = dbm.getPrimaryKeys(null, "%", name);
 			if(rs2.next())
 			{
@@ -88,88 +75,21 @@ public class Database {
 		}
 		return new DBTable(name, fields, keyField, this);
 	}
-	/*
-	private void createTable(String name, FieldDefinition fields[]) {
-		try {
-			Statement st = myConnection.createStatement();
-			String query = "CREATE TABLE "+name + "(";
-			Boolean firstField = true;
-			for(FieldDefinition field : fields)
-			{
-				if(!firstField)
-				{
-					query +=",";
-				}
-				query += field.name + " " + field.datatype;
-				firstField = false;
-			}
-			query += ")";
-			st.executeUpdate(query);
-			//System.out.println("Table creation process successfully!");
-		}
-		catch(SQLException s){
-			System.out.println("Table already exists!");
-		}
-	}
-	*/
-	public PersistentObject createPersistentObject(String persistentClass, String tableName)
-	{
-		PersistentObject ret = null;
-		DBTable table = getTable(tableName);
-		/*
-		@SuppressWarnings("rawtypes")
-		Class[] ctorArgs = new Class[1];
-		ctorArgs[0] = DBTable.class;
-		try {
-			ret = (PersistentObject)Class.forName(persistentClass).getConstructor(ctorArgs).newInstance(table);
-		} catch (InstantiationException | IllegalAccessException
-				| IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException
-				| ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		*/
-		//String query = "INSERT " + table.Name + " VALUES(";
-		String query = "INSERT " + table.Name + " SET " ;
-		//Map<String, Object> properties = ret.getProperties();
-		Set<String> fields = table.Fields;
-		boolean firstValue = true;
-		for(String fname : fields)
-		{
-			if(!firstValue)
-			{
-				query += ", ";
-			}
-			firstValue = false;
-			query += fname + "=" + "DEFAULT";
-		}
-		//query += ")";
+
+	public void storePersistentObject(PersistentObject obj) {
 		try
 		{
 			Statement st = myConnection.createStatement();
-			st.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
-			ResultSet rs = st.getGeneratedKeys();
-			if(rs.next())
+			String query;
+			if(obj.isNew)
 			{
-				int key = rs.getInt(1);
-				String whereStmt = table.KeyField + " = " + Integer.toString(key);
-				ret = retrievePersistentObjects(persistentClass, tableName, whereStmt).next();
+				query = "INSERT ";
 			}
-		}
-		catch(SQLException s)
-		{
-			//ret = null;
-		}
-		return ret;
-	}
-	
-	public void updatePersistentObject(PersistentObject obj) {
-		try
-		{
-			Statement st = myConnection.createStatement();
-			String query = "UPDATE " + obj.getTable().Name + " SET ";
+			else
+			{
+				query = "UPDATE ";
+			}
+			query += obj.getTable().Name + " SET ";
 			Map<String, Object> properties = obj.getProperties();
 			Set<String> fields = obj.getTable().Fields;
 			boolean firstValue = true;
@@ -182,125 +102,37 @@ public class Database {
 				firstValue = false;
 				query += fname + "=" + getValueString(properties.get(fname));
 			}
-			query += " WHERE " + obj.getTable().KeyField + " = " + getValueString(properties.get(obj.getTable().KeyField));
-			//query += ")";
-			st.executeUpdate(query);
+			if(!obj.isNew)
+			{
+				query += " WHERE " + obj.getTable().KeyField + " = " + getValueString(properties.get(obj.getTable().KeyField));
+			}
+			if(obj.isNew)
+			{
+				st.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+				ResultSet rs = st.getGeneratedKeys();
+				if(rs.next())
+				{
+					int key = rs.getInt(1);
+					String whereStmt = obj.getTable().KeyField + " = " + Integer.toString(key);
+					
+					PersistentObject obj2 = retrievePersistentObjects(obj.getClass(), obj.getTable().Name, whereStmt).next();
+					
+					//if the key was auto-generated, make sure it gets updated back to the object...
+					obj.setPersistentValue(obj.getTable().KeyField, obj2.getPersistentValue(obj.getTable().KeyField));
+					obj.isNew = false;
+				}
+			}
+			else
+			{
+				st.executeUpdate(query);
+			}
+			
 		}
 		catch(SQLException x1)
 		{
 			System.out.println("Error...!");
-			/*
-			//failed to store the object ... make sure the table exists
-			try
-			{
-				FieldDefinition fd[] = buildFieldDefinitions(obj);
-				createTable(obj.getTable().Name, fd);
-				storeInternal(obj);
-			}
-			catch(SQLException x2)
-			{
-				//failed to store the object
-			}
-			*/
 		}
 	}
-/*	
-	private FieldDefinition[] buildFieldDefinitions(PersistentObject obj)
-	{
-		Map<String, Object> propertyMap = obj.getProperties();
-		FieldDefinition[] ret = new FieldDefinition[propertyMap.size()];
-		Set<String> fieldNames = propertyMap.keySet();
-		int index = 0;
-		for(String fname : fieldNames)
-		{
-			Object o = propertyMap.get(fname);
-			ret[index].name = fname;
-			ret[index].datatype = getDatatypeName(o);
-			++index;
-		}
-		return ret;
-	}
-	*/
-
-	/*
-	private String getDatatypeName(Object obj)
-	{
-		String ret;
-		
-		//if(obj instanceof PersistentObject)
-		//{
-		//	PersistentObject po = (PersistentObject)obj;
-		//	//get the foreign key...
-		//	ret = getDatatypeName(po.getProperties().get(po.getTable().KeyField));
-		//}
-		//else 
-		if(obj instanceof String)
-		{
-			ret = "VARCHAR";
-		}
-		else if(obj instanceof Integer)
-		{
-			ret = "INTEGER";
-		}
-		else if(obj instanceof Long)
-		{
-			ret = "BIGINT";
-		}
-		else if(obj instanceof Float)
-		{
-			ret = "REAL";
-		}
-		else if(obj instanceof Double)
-		{
-			ret = "DOUBLE";
-		}
-		else if(obj instanceof Boolean)
-		{
-			ret = "BIT";
-		}
-		else if(obj instanceof Byte)
-		{
-			ret = "TINYINT";
-		}
-		else if(obj instanceof Date)
-		{
-			ret = "DATE";
-		}
-		else if(obj instanceof Time)
-		{
-			ret = "TIME";
-		}
-		else if(obj instanceof Timestamp)
-		{
-			ret = "TIMESTAMP";
-		}
-		else
-		{
-			ret = "VARCHAR"; //last resort, store toString...
-		}
-		return ret;
-	}
-	*/
-	/*
-	private void storeInternal(PersistentObject obj) throws SQLException
-	{
-		Statement st = myConnection.createStatement();
-		String query = "INSERT " + obj.getTable().Name + " VALUES(";
-		Map<String, Object> properties = obj.getProperties();
-		Set<String> fields = obj.getTable().Fields;
-		Boolean firstValue = true;
-		for(String fname : fields)
-		{
-			if(!firstValue)
-			{
-				query += ",";
-			}
-			query += fname + "=" + getValueString(properties.get(fname));
-		}
-		query += ")";
-		st.executeUpdate(query);
-	}
-	*/
 	
 	private String getValueString(Object obj)
 	{
@@ -309,64 +141,13 @@ public class Database {
 		{
 			ret = "DEFAULT";
 		}
-		/*
-		else if(obj instanceof PersistentObject)
-		{
-			PersistentObject po = (PersistentObject)obj;
-			//get the foreign key...
-			ret = getValueString(po.getProperties().get(po.getTable().KeyField));
-		}
-		*/
 		else if(obj instanceof String)
 		{
 			ret = sanitize((String)obj);
 		}
-		else if(obj instanceof Integer)
-		{
-			ret = ((Integer)obj).toString();
-		}
-		else if(obj instanceof Long)
-		{
-			ret = ((Long)obj).toString();
-		}
-		else if(obj instanceof Float)
-		{
-			ret = ((Float)obj).toString();
-		}
-		else if(obj instanceof Double)
-		{
-			ret=((Double)obj).toString();
-		}
-		else if(obj instanceof Boolean)
-		{
-			if(((Boolean)obj).booleanValue())
-			{
-				ret = "1";
-			}
-			else
-			{
-				ret = "0";
-			}
-		}
-		else if(obj instanceof Byte)
-		{
-			ret = ((Byte)obj).toString();
-		}
-		else if(obj instanceof Date)
-		{
-			ret = ((Date)obj).toString();
-		}
-		else if(obj instanceof Time)
-		{
-			ret = ((Time)obj).toString();
-		}
-		else if(obj instanceof Timestamp)
-		{
-			ret = ((Timestamp)obj).toString();
-		}
 		else
 		{
-			ret = sanitize(obj.toString());
+			ret = obj.toString();
 		}
 		return ret;
 	}
@@ -386,7 +167,7 @@ public class Database {
 		return ret;
 	}
 	
-	public String sanitize(String rawData)
+	public static String sanitize(String rawData)
 	{
 		//Make string data safe for storage in the database
 		//replace any \ with a \\
@@ -399,7 +180,7 @@ public class Database {
 		return "'" + rawData + "'";
 	}
 	
-	public String unsanitize(String sanitizedData)
+	public static String unsanitize(String sanitizedData)
 	{
 		//Convert string back to original format...
 		String ret = "";
@@ -414,13 +195,25 @@ public class Database {
 		return ret;
 	}
 	
-	public RetrieveResult retrievePersistentObjects(String persistentClass, String tableName, String whereStmt) {
+	public PersistentObject retrieveObjectByKey(@SuppressWarnings("rawtypes") Class persistentClass, String tableName, Object keyValue)
+	{
+		PersistentObject ret = null;
+		if(keyValue != null)
+		{
+			DBTable table = getTable(tableName);
+			String whereClause = table.KeyField + " = " + getValueString(keyValue);
+			RetrieveResult result = retrievePersistentObjects(persistentClass, tableName, whereClause);
+			ret = result.next();
+		}
+		return ret;
+	}
+	public RetrieveResult retrievePersistentObjects(@SuppressWarnings("rawtypes") Class persistentClass, String tableName, String whereStmt) {
 		RetrieveResult result = null;
 		try
 		{
 			Statement st = myConnection.createStatement();
 			ResultSet rs = st.executeQuery("SELECT * FROM "+tableName+ " WHERE " + whereStmt);
-			result = new RetrieveResult(persistentClass, rs, getTable(tableName));
+			result = new RetrieveResult(persistentClass, rs, this);
 		}
 		catch (SQLException s){
 		}
