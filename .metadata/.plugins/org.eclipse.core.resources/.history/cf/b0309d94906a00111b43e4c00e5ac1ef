@@ -1,0 +1,46 @@
+package model;
+//import java.security.Security;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.*;
+import javax.mail.*;
+import javax.mail.Message.RecipientType;
+import javax.mail.internet.*;
+import sun.net.smtp.SmtpClient;
+
+public class SendMail {
+			
+			public static void main(String[] args){
+				String host = "smtp.live.com";
+				String username = "user";
+				String password = "joud_islam";
+				Properties props = new Properties();
+			      props.put("mail.transport.protocol", "smtp");
+			      props.put("mail.host", host);
+			      props.put("mail.smtp.starttls.enable",true);
+			      props.put("mail.user", username);
+			      props.put("mail.password",password);
+			      props.put("mail.smtp.auth", "true");
+			      
+			      Session mailSession = Session.getInstance(props, null);
+			     try{
+			      Transport transport = mailSession.getTransport("smtp");
+
+			      MimeMessage message = new MimeMessage(mailSession);
+			      message.setSubject("Testing javamail plain");
+			      message.setContent("This is a test", "text/plain");
+			      message.addRecipient(Message.RecipientType.TO,
+			           new InternetAddress("tbagis@hotmail.com"));
+
+			      transport.connect(username,password);
+			      transport.sendMessage(message,
+			          message.getRecipients(Message.RecipientType.TO));
+			      transport.close();
+			     }
+			     catch (Exception e){
+			    	 e.printStackTrace();
+			     }
+				}
+				}
+			
+

@@ -1,0 +1,62 @@
+<html dir="rtl">
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>myPM-ScrumTool</title>
+</head>
+
+<body>
+<table>
+<tr><td colspan=2>
+
+		<img border="0" src="h8y09170.jpg" width="1258" height="163"></td>
+
+<tr><td>
+<table>
+	<tr>
+		<td>
+		Invite User:
+		<form action="InviteUserServlet" method="get">
+		<tr><td>User Email:
+		<td>
+			<input type="text" name="userEmail">
+		<tr><td>
+			User Type:<td>
+			<select name="roleDesc">
+			<option value="Instructor">Instructor</option>
+			<option value="Administrator">Administrator</option>
+			<option>Student</option>
+			<option>Customer</option>
+			</select>
+			<tr><td>
+			
+			Class No.:
+			<td>
+			<select name="classNo">
+			<option value="SE430">SE430</option>
+			<option value="SE477">SE477</option>
+			</select>
+		<tr><td colspan=2>
+			<input type="submit" value="Invite"> 
+			<input type="reset" value="reset">
+		</form>
+		</table>
+		</td>
+<td>
+
+<p align="center">left menue</p>
+&nbsp;</td>
+	</tr>
+</table>
+<tr><td colspan=2>
+<table>
+	<tr>
+		<td height="61" width="1260">
+		&nbsp;<p align="center">footer</td>
+	</tr>
+</table>
+	</td></tr>
+</table>
+</body>
+</html>

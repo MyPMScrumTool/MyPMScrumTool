@@ -1,0 +1,46 @@
+package model;
+//import java.security.Security;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.*;
+import javax.mail.*;
+import javax.mail.Message.RecipientType;
+import javax.mail.internet.*;
+import sun.net.smtp.SmtpClient;
+
+public class SendMail {
+			
+			public static void main(String[] args){
+				String from = "tbagis@hotmail.com";
+				String to = "tbagis@hotmail.com";
+				String subject = "Test";
+				String text = "A test message";
+			//	Properties props = new Properties();
+			//	props.put("mail.smtp.host",  "smtp.live.com");
+			
+				//  String from="gseshad@hotmail.com";
+				//  String to="gov@jguru.com, govi@bigfoot.com";
+				  try{
+				      SmtpClient client = new SmtpClient("smtp.live.com");
+				      client.from(from);
+				      client.to(to);
+				      PrintStream message = client.startMessage();
+				      message.println("To: " + to);
+				      message.println("Subject:  Sending email from JSP!");
+				      message.println("This was sent from a JSP page!");
+				      message.println();
+				      message.println("Cool beans! :-)");
+				      message.println();     
+				      message.println();
+				      client.closeServer();
+				   }
+				   catch (IOException e){	
+				      System.out.println("ERROR SENDING EMAIL:"+e);
+				   }	
+				
+			}
+
+			}
+
+			
+

@@ -1,0 +1,108 @@
+package domainModel.copy;
+import pmPersistence.Database;
+import pmPersistence.PersistentObject;
+
+
+public class User extends PersistentObject {
+
+	public final static String TABLE = "users";
+	private final static String USER_ID = "UserID";
+	private final static String PROJECT_ID = "ProjectID";
+	private final static String NAME = "UserName";
+	private final static String PASSWORD = "UserPassword";
+	private final static String ACCESS_LEVEL = "AccessLevelID";
+	private final static String EMAIL = "Email";
+	private final static String CLASS = "Class";
+	
+	
+	public User(Database db) {
+		super(db.getTable(TABLE));
+
+	}
+	
+	public int getUserId()
+	{
+		Integer i =(Integer)getPersistentValue(USER_ID);
+		if(i == null)
+		{
+			return 0;
+		}
+		return i.intValue();
+	}
+	
+	public int getProjectId()
+	{
+		Integer i =(Integer)getPersistentValue(PROJECT_ID);
+		if(i == null)
+		{
+			return 0;
+		}
+		return i.intValue();
+	}
+	
+	public Role getRole()
+	{
+		Role ret = null;
+		Integer accessLevel =(Integer)getPersistentValue(ACCESS_LEVEL);
+		if(accessLevel!=null)
+		{
+			ret = (Role)myTable.Db.retrieveObjectByKey(Role.class.getName(), Role.TABLE, accessLevel);
+		}
+		return ret;
+	}
+	
+	public String getUserName()
+	{
+		return (String)getPersistentValue(NAME);
+	}
+	
+	public String getPassword()
+	{
+		return (String)getPersistentValue(PASSWORD);
+	}
+	
+	public String getClassName()
+	{
+		return (String)getPersistentValue(CLASS);
+	}
+	
+	public String getEmail()
+	{
+		return (String)getPersistentValue(EMAIL);
+	}
+	
+	public void setProjectId(int id)
+	{
+		setPersistentValue(PROJECT_ID, new Integer(id));
+	}
+	
+	public void setRole(Role role)
+	{
+		if(role != null)
+		{
+			setPersistentValue(ACCESS_LEVEL, new Integer(role.getAccessLevelId()));
+		}
+	}
+	
+	public void setUserName(String username)
+	{
+		setPersistentValue(NAME, username);
+	}
+	
+	public void setPassword(String password)
+	{
+		setPersistentValue(PASSWORD, password);
+	}
+	
+	public void setEmail(String email)
+	{
+		setPersistentValue(EMAIL, email);
+	}
+	
+	public void setClassName(String className)
+	{
+		setPersistentValue(CLASS, className);
+	}
+	
+
+}

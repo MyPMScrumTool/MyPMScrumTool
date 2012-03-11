@@ -1,0 +1,18 @@
+package testPackage;
+
+import model.SendMail;
+
+public class EmailTest {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SendMail mail= new SendMail("tbagis@hotmail.com", "few");
+		mail.send();
+		
+		System.out.println("done");
+	}
+
+}

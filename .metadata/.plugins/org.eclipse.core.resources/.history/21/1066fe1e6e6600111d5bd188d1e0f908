@@ -1,0 +1,20 @@
+package controller;
+
+public class DesignPage {
+	private StringBuilder page= new StringBuilder("fffw");
+	DesignPage(String str){
+		page.append(str);
+	}
+	DesignPage(){
+	}
+	public void pageCon(String str){
+//		page.append("<html>");
+//		page.append("<body><p>");
+		page.append(str);
+//		page.append("</body>");
+//		page.append("</html>");
+	}
+public String getPage(){
+		return page.toString();
+	}
+}

@@ -1,0 +1,50 @@
+package model;
+
+import java.io.*;
+import java.net.*;
+
+public class SendMail {
+	private String receiverEmail;
+	private String senderEmail;
+	private String msg;
+	public SendMail(String reciverEmail, String msg){
+		this.receiverEmail = reciverEmail;
+		this.msg = msg;
+	}
+	
+	public void send(){
+	    try {
+
+	 //     if (args.length >= 1) System.getProperties().put("mail.host", args[0]);
+	      BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
+	      URL u = new URL("mailto:" + receiverEmail);      
+	      URLConnection c = u.openConnection(); 
+	      c.setDoInput(false);                  
+	      c.setDoOutput(true);                   
+	      c.connect();                          
+	      PrintWriter out =                     
+	        new PrintWriter(new OutputStreamWriter(c.getOutputStream()));
+	      out.println("To: " + receiverEmail);
+	      out.println("Subject: " + "Hi");
+	      out.println();  
+
+	      System.out.println("Enter the message. " + 
+	                         "End with a '.' on a line by itself.");
+	      String line; 
+	      for(;;) {
+	        line = in.readLine();
+	        if ((line == null) || line.equals(".")) break;
+	        out.println(line);
+	      }
+
+	      out.close();
+	      System.out.println("Message sent.");
+	      System.out.flush();
+	    }
+	    catch (Exception e) {  
+	      System.err.println(e);
+	      System.err.println("Usage: java sndmail [your.mailserver.com]");
+	    }
+	  }
+}

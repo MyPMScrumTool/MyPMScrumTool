@@ -1,0 +1,5 @@
+package data.copy;
+
+public class User {
+
+}

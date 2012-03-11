@@ -1,0 +1,49 @@
+package model;
+//import java.security.Security;
+import java.util.*;
+import javax.mail.*;
+import javax.mail.Message.RecipientType;
+import javax.mail.internet.*;
+
+public class SendMail {
+			
+			public static void main(String[] args){
+				String from = "tbagis@hotmail.com";
+				String to = "tbagis@hotmail.com";
+				String subject = "Test";
+				String text = "A test message";
+				Properties props = new Properties();
+				props.put("mail.smtp.host",  "smtp.live.com");
+				props.put("mail.smtp.port", "587");
+				props.put("mail.smtp.starttls.enable",true);
+				Session mailSession = Session.getDefaultInstance(props);
+				Message simpleMessage = new MimeMessage(mailSession);
+				
+				InternetAddress fromAddress = null;
+				InternetAddress toAddress = null;
+				try {
+					fromAddress = new InternetAddress(from);
+					toAddress = new InternetAddress(to);
+				} catch (AddressException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				try {
+					simpleMessage.setFrom(fromAddress);
+					simpleMessage.setRecipient(RecipientType.TO, toAddress);
+					simpleMessage.setSubject(subject);
+					simpleMessage.setText(text);
+					
+					Transport.send(simpleMessage);			
+				} catch (MessagingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+				
+			}
+
+			}
+
+			
+

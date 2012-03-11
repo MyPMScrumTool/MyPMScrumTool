@@ -1,0 +1,62 @@
+<html dir="rtl">
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>myPM-ScrumTool</title>
+</head>
+
+<body>
+<table>
+<tr><td>
+<table border="1" width="1256" height="91">
+	<tr>
+		<td height="91" width="1256">
+		<p dir="ltr" align="center">
+		<img border="0" src="h8y09170.jpg" width="1258" height="163"></td>
+	</tr>
+</table>
+<tr><td>
+<table border="1" width="1269" height="475">
+	<tr>
+		<td height="475" width="1065">
+		<p dir="ltr" align="center"><font color="#000080"><b>Invite User:</b></font></p>
+		<form action="InviteUserServlet" method="get">
+			User Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<input type="text" name="userEmail"><b>&nbsp;&nbsp;&nbsp
+		
+			User Type:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;
+			<select name="roleDesc">
+			<option value="Instructor">Instructor</option>
+			<option value="Administrator">Administrator</option>
+			<option>Student</option>
+			<option>Customer</option>
+			</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b></font></p>
+			
+			Class No.:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<select name="classNo">
+			<option value="SE430">SE430</option>
+			<option value="SE477">SE477</option>
+			</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		
+			<input type="submit" value="Invite"> 
+			<input type="reset" value="reset">
+		</form>
+		</td>
+<td>
+
+<p align="center">left menue</p>
+&nbsp;</td>
+	</tr>
+</table>
+<tr><td>
+<table border="0">
+	<tr>
+		<td height="61" width="1260">
+		&nbsp;<p align="center">footer</td>
+	</tr>
+</table>
+	</td></tr>
+</table>
+</body>
+</html>
