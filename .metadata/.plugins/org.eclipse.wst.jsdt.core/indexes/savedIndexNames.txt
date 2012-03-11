@@ -1,8 +1,6 @@
-INDEX VERSION 1.122+C:\Project\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
-502346627.index
-1793320816.index
-520973110.index
+INDEX VERSION 1.122+C:\Project_bcrombie\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+1595844426.index
+1541809539.index
 740144719.index
-1227488874.index
-3313374074.index
-1528465113.index
+2628437107.index
+4172151386.index
