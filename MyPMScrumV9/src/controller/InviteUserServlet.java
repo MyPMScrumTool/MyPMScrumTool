@@ -44,7 +44,7 @@ public class InviteUserServlet extends HttpServlet {
 		String classNo = request.getParameter("classNo");
 		DesignPage page= new DesignPage();
 		if((userEmail == null) || userEmail.isEmpty() || (roleDesc == null) ||roleDesc.isEmpty() || (classNo == null) || classNo.isEmpty()){
-			page.pageCon("all fields are requiered");
+			page.pageCon("all fields are required");
 		}
 		else if(!(userEmail.contains("@")) || !(userEmail.contains("."))){
 			page.pageCon("user email is wrong");
@@ -61,8 +61,10 @@ public class InviteUserServlet extends HttpServlet {
 				page.pageCon("Role is wrong " + roleDesc);
 			}
 			else{
-				result = myDb.retrievePersistentObjects(User.class, User.TABLE, "Email = " + Database.sanitize(userEmail));
-				if(result.next() !=null){
+				User existingUser = User.findByEmail(myDb, userEmail);
+				if(existingUser != null) {
+				//result = myDb.retrievePersistentObjects(User.class, User.TABLE, "Email = " + Database.sanitize(userEmail));
+				//if(result.next() !=null){
 						page.pageCon("<br>This user email address already exists<br>Please use a different user email<br>");
 				}
 				else {
@@ -75,11 +77,11 @@ public class InviteUserServlet extends HttpServlet {
 					user.setEmail(userEmail);
 					user.setClassName(classNo);
 					user.setAccessLevel(roleObj.getAccessLevelId());
-					myDb.storePersistentObject(user);
-					page.pageCon("<br>User succesfully registered!<br>");
+					user.persist();
+					page.pageCon("<br>User successfully registered!<br>");
 				}
 				else
-					page.pageCon("An excpetion occurs, the invitation has not been sent");
+					page.pageCon("An exception occurred, the invitation has not been sent");
 				}
 			}
 			

@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import pmPersistence.Database;
 import domainModel.User;
 import domainModel.Role;
 
@@ -37,40 +36,84 @@ public class CreateUserAccountServlet extends HttpServlet {
 		String userName = request.getParameter("userName").trim();
 		String password = request.getParameter("password").trim();
 		String password2 = request.getParameter("password2").trim();
-		DesignPageManuel page= new DesignPageManuel();
+		String email = request.getParameter("email").trim();
+		//DesignPageManuel page= new DesignPageManuel();
+		DesignPage page = new DesignPage();
+		
+		if(email == null || email.isEmpty())
+		{
+			page.pageCon("<br>You must access this page through the link provided in the invitation email<br>");
+			out.println(page.getPage());
+			out.close();
+			return;
+		}
 		if((userName == null) || userName.isEmpty() || (password == null) || password.isEmpty()){
 			page.pageCon("<br>Please enter a valid user and password<br> ");
 			out.println(page.getPage());
+			out.close();
 			return;
 		}
 		if(userName.length()>45 || password.length()>10){
 			page.pageCon("<br>Your user must less than 45 characteres<br><br> and your password less than 10 characteres<br>");
 			out.println(page.getPage());
+			out.close();
+			return;
+		}
+		if((password2 == null) || !(password.equals(password2)))
+		{
+			page.pageCon("<br>Passwords do not match<br>");
+			out.println(page.getPage());
+			out.close();
 			return;
 		}
 		
-	    pmPersistence.RetrieveResult result = myDb.retrievePersistentObjects(User.class, User.TABLE, "UserName = " + Database.sanitize(userName));
-		domainModel.User userObj = (domainModel.User)result.next();
-		if(userObj != null)
-			{
+		User emailUser = User.findByEmail(myDb, email);
+		if(emailUser == null)
+		{
+			page.pageCon("<br>This email address does not have an invitation<br>");
+			out.println(page.getPage());
+			out.close();
+			return;
+		}
+		if(emailUser.getUserName() != null)
+		{
+			page.pageCon("<br>This email address has already been registered<br>");
+			out.println(page.getPage());
+			out.close();
+			return;
+		}
+		User nameUser = User.findByName(myDb, userName);
+		if(nameUser != null)
+		{
 				page.pageCon("<br>This user already exists<br>Please use a different User name<br>");
 				out.println(page.getPage());
+				out.close();
 				return;
 		}
-		else if(password.equals(password2)){
-		User usr = new User(myDb);
-		usr.setUserName(userName);
-		usr.setPassword(password);
-		usr.setRole(Role.getRole(myDb, Role.STUDENT));
-		myDb.storePersistentObject(usr);
-		page.pageCon("<br>User succesfully registered!<br>");
-		out.println(page.getPageLogin());
-		return;
-		}
-		else{
-			page.pageCon("<br>Password does not match!<br>");
+		//if(password.equals(password2))
+		//{
+			//User usr = User.findByEmail(myDb, email)
+		//User usr = new User(myDb);
+			emailUser.setUserName(userName);
+			emailUser.setPassword(password);
+			emailUser.setRole(Role.getRole(myDb, Role.STUDENT));
+			if(emailUser.persist())
+			{
+				//myDb.storePersistentObject(emailUser);
+				page.pageCon("<br>User succesfully registered!<br>");
+			}
+			else
+			{
+				page.pageCon("<br>Unknown error.  Could not register user!<br>");
+			}
+			
 			out.println(page.getPage());
-		}
+		//return;
+		//}
+		//else{
+			//page.pageCon("<br>Password does not match!<br>");
+			//out.println(page.getPage());
+		//}
 		out.close();
 	}
 

@@ -46,4 +46,9 @@ public class PersistentObject {
 		}
 		return ret;
 	}
+	
+	public boolean persist()
+	{
+		return myTable.Db.storePersistentObject(this);
+	}
 }

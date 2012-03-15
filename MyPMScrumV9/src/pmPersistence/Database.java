@@ -76,7 +76,8 @@ public class Database {
 		return new DBTable(name, fields, keyField, this);
 	}
 
-	public void storePersistentObject(PersistentObject obj) {
+	protected boolean storePersistentObject(PersistentObject obj) {
+		int rowCount = 0;
 		try
 		{
 			Statement st = myConnection.createStatement();
@@ -108,7 +109,7 @@ public class Database {
 			}
 			if(obj.isNew)
 			{
-				st.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+				rowCount = st.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
 				ResultSet rs = st.getGeneratedKeys();
 				if(rs.next())
 				{
@@ -124,14 +125,14 @@ public class Database {
 			}
 			else
 			{
-				st.executeUpdate(query);
+				rowCount = st.executeUpdate(query);
 			}
-			
 		}
 		catch(SQLException x1)
 		{
 			System.out.println("Error...!");
 		}
+		return (rowCount == 1);
 	}
 	
 	private String getValueString(Object obj)

@@ -20,13 +20,13 @@ public class User extends PersistentObject {
 	
 	public static User findByName(Database db, String name)
 	{
-		RetrieveResult result = db.retrievePersistentObjects(User.class, TABLE, NAME + " = " + name);
+		RetrieveResult result = db.retrievePersistentObjects(User.class, TABLE, NAME + " = " + Database.sanitize(name));
 		return (User)result.next();
 	}
 	
 	public static User findByEmail(Database db, String email)
 	{
-		RetrieveResult result = db.retrievePersistentObjects(User.class, TABLE, EMAIL + " = " + email);
+		RetrieveResult result = db.retrievePersistentObjects(User.class, TABLE, EMAIL + " = " + Database.sanitize(email));
 		return (User)result.next();
 	}
 	public User(Database db) {

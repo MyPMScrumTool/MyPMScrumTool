@@ -25,8 +25,8 @@ public class DBTest {
 		
 		
 		usr.setUserName("Brian");
-		
-		db.storePersistentObject(usr);
+		usr.persist();
+		//db.storePersistentObject(usr);
 		int uid = usr.getUserId();
 		User usr2 = (User)db.retrieveObjectByKey(User.class, User.TABLE, new Integer(uid));
 		//RetrieveResult result = db.retrievePersistentObjects(User.class, User.TABLE, "UserID = " + Integer.toString(uid)); 
